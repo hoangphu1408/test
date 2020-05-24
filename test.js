@@ -8,7 +8,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.static(__dirname + "/public"));
 const data = [];
-
+const PORT = process.env.PORT || 5000;
 app.get("/test", (req, res) => {
   res.render("test", {
     data: data,
@@ -21,6 +21,6 @@ app.post("/test", (req, res) => {
   //return res.redirect("back");
 });
 
-app.listen(5000, () => {
+app.listen(PORT, () => {
   console.log("Start");
 });
