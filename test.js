@@ -1,14 +1,30 @@
 const express = require("express");
 const expressLayout = require("express-ejs-layouts");
 const bodyParser = require("body-parser");
+const multer = require("multer");
+const path = require("path");
 const app = express();
 
 app.use(expressLayout);
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.static(__dirname + "/public"));
+const storage = multer.diskStorage({
+  destination: "public/uploads",
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
+
+const upload = multer({
+  storage: storage,
+});
+
 const data = [];
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 app.get("/test", (req, res) => {
   res.render("test", {
     data: data,
@@ -16,9 +32,12 @@ app.get("/test", (req, res) => {
 });
 
 app.post("/test", (req, res) => {
-  data.push(req.body);
   res.send(req.body);
-  //return res.redirect("back");
+});
+
+app.post("/images", upload.single("file"), (req, res) => {
+  console.log(req.file);
+  res.send(req.file);
 });
 
 app.listen(PORT, () => {

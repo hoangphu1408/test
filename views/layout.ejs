@@ -28,20 +28,133 @@
       ></textarea>
       <button type="submit">Post</button>
     </form>
+    <form action="/images" method="POST" enctype="multipart/form-data">
+      <input class="test" type="file" id="file" />
+    </form>
+    <div id="demo"></div>
     <script>
-      $("#summernote").summernote({
-        height: $(window).height() - 300,
-        callbacks: {
-          onImageUpload: function (image) {
-            uploadImage(image[0]);
-          },
-        },
-      });
+      $(document).ready(function () {
+        $("#summernote").summernote({
+          placeholder: "enter directions here...",
+          height: 300,
+        });
 
-      $("#summernote").summernote(
-        "editor.insertImage",
-        "https://monamedia.co/wp-content/uploads/2020/02/url-la-gi.jpg"
-      );
+        $(document).on("change", "#file", function () {
+          var name = document.getElementById("file").files[0].name;
+          var form_data = new FormData();
+          var ext = name.split(".").pop().toLowerCase();
+          if (jQuery.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1) {
+            alert("Invalid Image File");
+          }
+          var oFReader = new FileReader();
+          oFReader.readAsDataURL(document.getElementById("file").files[0]);
+          var f = document.getElementById("file").files[0];
+          var fsize = f.size || f.fileSize;
+          if (fsize > 200000) {
+            alert("Image File Size is very big");
+          } else {
+            var link = "http://localhost:3000/uploads/";
+            form_data.append("file", document.getElementById("file").files[0]);
+            $.ajax({
+              url: "/images",
+              method: "POST",
+              data: form_data,
+              dataType: "json",
+              contentType: false,
+              cache: false,
+              processData: false,
+
+              success: function (data) {
+                var fname = data.filename;
+                link += fname;
+                console.log(link);
+              },
+              complete: function () {
+                $("#summernote").summernote("editor.insertImage", link);
+              },
+            });
+            //$("#summernote").summernote("editor.insertText", link);
+          }
+        });
+      });
+      // function myFunction() {
+      //   var fomr_data = new FormData();
+      //   form_data.append("file", document.getElementById("file").files[0]);
+      //   $.ajax({
+      //     url: "/test",
+      //     method: "POST",
+      //     data: form_data,
+      //     contentType: false,
+      //     cache: false,
+      //     processData: false,
+      //     beforeSend: function () {
+      //       $("#summernote").summernote("insertText", "hihi");
+      //     },
+      //     success: function () {
+      //       $("#summernote").summernote("insertText", "hihi");
+      //     },
+      //   });
+      // }
     </script>
   </body>
 </html>
+
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      Webslesson Tutorial | Upload File without using Form Submit in Ajax PHP
+    </title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+    />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+    <br /><br />
+    <div class="container" style="width: 700px;">
+      <h2 align="center">Upload File without using Form Submit in Ajax PHP</h2>
+      <br />
+      <label>Select Image</label>
+      <input type="file" name="file" id="file" />
+      <br />
+      <span id="uploaded_image"></span>
+    </div>
+  </body>
+</html>
+
+<script>
+  $(document).ready(function () {
+    $(document).on("change", "#file", function () {
+      var name = document.getElementById("file").files[0].name;
+      var form_data = new FormData();
+      var ext = name.split(".").pop().toLowerCase();
+      if (jQuery.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1) {
+        alert("Invalid Image File");
+      }
+      var oFReader = new FileReader();
+      oFReader.readAsDataURL(document.getElementById("file").files[0]);
+      var f = document.getElementById("file").files[0];
+      var fsize = f.size || f.fileSize;
+      if (fsize > 200000) {
+        alert("Image File Size is very big");
+      } else {
+        form_data.append("file", document.getElementById("file").files[0]);
+        $.ajax({
+          url: "/test",
+          method: "POST",
+          data: form_data,
+          contentType: false,
+          cache: false,
+          processData: false,
+          sucess: function (data) {
+            alert(data);
+          },
+        });
+      }
+    });
+  });
+</script> -->
